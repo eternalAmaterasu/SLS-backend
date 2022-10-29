@@ -110,13 +110,21 @@ def update_user_qna():
         email=user_qna.email,
         qna=user_qna.qna
     )
+    conn.execute(row)
     print(user_qna.qna)
     return "Done"
 
 
 @app.route('/user/qna/<user_email>', methods=['GET'])
 def get_user_qna(user_email):
-    return "Done"
+    row = user_qna_ds.select().where(user_qna_ds.c.email == user_email)
+    result = conn.execute(row)
+    user_qna = None
+    for row in result:
+        user_qna = UserQnA(user_email, row.qna)
+        return user_qna.__dict__
+
+    return "Not found"
 
 
 @app.route('/qna', methods=['POST'])
