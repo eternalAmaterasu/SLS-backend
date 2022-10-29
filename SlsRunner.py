@@ -121,23 +121,38 @@ def get_user_qna(user_email):
 
 @app.route('/qna', methods=['POST'])
 def create_qna():
-    print(request.json)
     qna = QnA(**request.json)
+    row = qna_ds.insert().values(
+        id=qna.id,
+        question=qna.question
+    )
+    conn.execute(row)
     print(qna.question)
-    return "Done"
+    return "Done adding"
 
 
 @app.route('/qna', methods=['PUT'])
 def update_qna():
-    print(request.json)
     qna = QnA(**request.json)
-    print(qna.question)
-    return "Done"
+    row = qna_ds.update().where(qna_ds.c.id == qna.id).values(
+        question=qna.question
+    )
+    conn.execute(row)
+    return "Done updating"
 
 
 @app.route('/qna', methods=['GET'])
 def get_qna():
-    return "Done"
+    qna_list = []
+    row = qna_ds.select()
+    result = conn.execute(row)
+    print(result)
+    [qna_list.append(UserQnA(row[0], row[1]).__dict__) for row in result]
+
+    data = {
+        "qna_list": qna_list
+    }
+    return data
 
 
 if __name__ == "__main__":
