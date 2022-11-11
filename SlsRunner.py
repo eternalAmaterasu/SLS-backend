@@ -4,6 +4,8 @@ import sqlalchemy as db
 from flask import Flask
 from flask import request
 
+from weather import RoutingBase
+
 
 class UserDetail:
     def __init__(self, email, password, **kwargs):
@@ -161,6 +163,11 @@ def get_qna():
         "qna_list": qna_list
     }
     return data
+
+
+@app.route('/weather/<location>', methods=['GET'])
+def get_weather(location):
+    return RoutingBase.fetch_weather_from_upstream(location)
 
 
 if __name__ == "__main__":
