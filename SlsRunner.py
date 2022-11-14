@@ -4,7 +4,7 @@ import sqlalchemy as db
 from flask import Flask
 from flask import request
 
-from weather import RoutingBase
+from weather.RoutingBase import RoutingBase
 
 
 class UserDetail:
@@ -29,13 +29,16 @@ class QnA:
 
 app = Flask(__name__)
 print("Firing up db connection from the server")
-engine = db.create_engine(f"cockroachdb://root:@{sys.argv[1]}:{sys.argv[2]}/{sys.argv[3]}")
-conn = engine.connect()
-print("DB connected!")
-md = db.MetaData()
-user_detail_ds = db.Table('user_detail', md, autoload=True, autoload_with=engine)
-user_qna_ds = db.Table('user_qna', md, autoload=True, autoload_with=engine)
-qna_ds = db.Table('qna', md, autoload=True, autoload_with=engine)
+try:
+    engine = db.create_engine(f"cockroachdb://root:@{sys.argv[1]}:{sys.argv[2]}/{sys.argv[3]}")
+    conn = engine.connect()
+    print("DB connected!")
+    md = db.MetaData()
+    user_detail_ds = db.Table('user_detail', md, autoload=True, autoload_with=engine)
+    user_qna_ds = db.Table('user_qna', md, autoload=True, autoload_with=engine)
+    qna_ds = db.Table('qna', md, autoload=True, autoload_with=engine)
+except Exception as e:
+    print(e)
 
 
 @app.route('/')
@@ -167,7 +170,10 @@ def get_qna():
 
 @app.route('/weather/<location>', methods=['GET'])
 def get_weather(location):
-    return RoutingBase.fetch_weather_from_upstream(location)
+    routing_base = RoutingBase()
+    weather_data = routing_base.fetch_weather_from_upstream(location)
+    routing_base = None  # force clearing memory
+    return weather_data
 
 
 if __name__ == "__main__":
