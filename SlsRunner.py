@@ -29,16 +29,14 @@ class QnA:
 
 app = Flask(__name__)
 print("Firing up db connection from the server")
-try:
-    engine = db.create_engine(f"cockroachdb://root:@{sys.argv[1]}:{sys.argv[2]}/{sys.argv[3]}")
-    conn = engine.connect()
-    print("DB connected!")
-    md = db.MetaData()
-    user_detail_ds = db.Table('user_detail', md, autoload=True, autoload_with=engine)
-    user_qna_ds = db.Table('user_qna', md, autoload=True, autoload_with=engine)
-    qna_ds = db.Table('qna', md, autoload=True, autoload_with=engine)
-except Exception as e:
-    print(e)
+
+engine = db.create_engine(f"cockroachdb://root:@{sys.argv[1]}:{sys.argv[2]}/{sys.argv[3]}")
+conn = engine.connect()
+print("DB connected!")
+md = db.MetaData()
+user_detail_ds = db.Table('user_detail', md, autoload=True, autoload_with=engine)
+user_qna_ds = db.Table('user_qna', md, autoload=True, autoload_with=engine)
+qna_ds = db.Table('qna', md, autoload=True, autoload_with=engine)
 
 
 @app.route('/')
