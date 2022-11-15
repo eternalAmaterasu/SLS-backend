@@ -42,7 +42,7 @@ class Answers:
 app = Flask(__name__)
 print("Firing up db connection from the server")
 
-engine = db.create_engine(f"cockroachdb://root:@{sys.argv[1]}:{sys.argv[2]}/{sys.argv[3]}")
+engine = db.create_engine(f"cockroachdb://root:@{sys.argv[1]}:{sys.argv[2]}/{sys.argv[3]}", connect_args={'connect_timeout': 20})
 conn = engine.connect()
 print("DB connected!")
 md = db.MetaData()
