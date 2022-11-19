@@ -4,6 +4,8 @@ import sqlalchemy as db
 from flask import Flask
 from flask import request
 
+from weather.RoutingBase import RoutingBase
+
 
 class UserDetail:
     def __init__(self, email, password, **kwargs):
@@ -27,6 +29,7 @@ class QnA:
 
 app = Flask(__name__)
 print("Firing up db connection from the server")
+
 engine = db.create_engine(f"cockroachdb://root:@{sys.argv[1]}:{sys.argv[2]}/{sys.argv[3]}")
 conn = engine.connect()
 print("DB connected!")
@@ -161,6 +164,14 @@ def get_qna():
         "qna_list": qna_list
     }
     return data
+
+
+@app.route('/weather/<location>', methods=['GET'])
+def get_weather(location):
+    routing_base = RoutingBase()
+    weather_data = routing_base.fetch_weather_from_upstream(location)
+    routing_base = None  # force clearing memory
+    return weather_data
 
 
 if __name__ == "__main__":
